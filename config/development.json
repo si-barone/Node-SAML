@@ -3,5 +3,6 @@
     "SAML_ISSUER": "Node-SAML",
     "SAML_PROTOCOL": "https://",
     "SAML_HOST": "localhost",
-    "SAML_LOGOUTURL": "https://your-idp-hostname/idp/idpSingleLogoutEndpoint"   
+    "SAML_LOGOUTURL": "https://your-idp-hostname/idp/idpSingleLogoutEndpoint",
+    "SAML_SIGNATURE_ALGORITHM": "sha256"
 }

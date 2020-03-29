@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('config');
 const xpath = require('xpath');
-const dom = require('xmldom').DOMParser;
+const Dom = require('xmldom').DOMParser;
 
 const express = require('express');
 const session = require('express-session');
@@ -27,7 +27,11 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: process.env.MYSECRET })); // You will need to export this ENV VARIABLE before running
+app.use(session({
+    secret: process.env.MYSECRET,
+    resave: false,
+    saveUninitialized: false
+    })); // You will need to export this ENV VARIABLE before running
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -46,6 +50,7 @@ const samlStrategy = new SAMLStrategy({
     protocol: config.get('SAML_PROTOCOL'),
     host: config.get('SAML_HOST'),
     logoutUrl: config.get('SAML_LOGOUTURL'),
+    signatureAlgorithm: config.get('SAML_SIGNATURE_ALGORITHM'),
     privateCert: privateKey,
     cert: idpCert,
 
@@ -111,7 +116,7 @@ app.post('/saml/consume', passport.authenticate('saml', {
                 '</saml:Assertion>'
         )[0] + '</saml:Assertion>';
     const deNamespacedXML = asserationXML.replace(/<saml:/g, '<').replace(/<\/saml:/g, '</');
-    const doc = new dom().parseFromString(deNamespacedXML);
+    const doc = new Dom().parseFromString(deNamespacedXML);
     const user = xpath.select('.//Subject/NameID/text()', doc);
 
     return res.redirect(`/app?user=${user}`);
@@ -123,6 +128,12 @@ app.get('/app/home', (req, res) => {
         heading: 'SAML Web Application'
     });
 });
+
+app.get('/metadata', (req, res) => {
+    const metadata = samlStrategy.generateServiceProviderMetadata(certificate, certificate);
+    res.set('Content-Type', 'text/xml')
+    res.send(metadata);
+})
 
 httpsServer.listen(8443, () => {
     console.log('SAML Test Application Started...');
