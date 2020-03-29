@@ -1,0 +1,7 @@
+{
+    "SAML_ENTRYPOINT": "https://your-idp-hostname/idp/idpAuthEndpoint",
+    "SAML_ISSUER": "Node-SAML",
+    "SAML_PROTOCOL": "https://",
+    "SAML_HOST": "localhost",
+    "SAML_LOGOUTURL": "https://your-idp-hostname/idp/idpSingleLogoutEndpoint"   
+}
